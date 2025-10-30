@@ -80,7 +80,12 @@ export class TradingExecutor {
 
   async executePlan(tradingPlan: TradingPlan): Promise<ExecutionResult> {
     try {
-      console.log(`🔄 Executing trade: ${tradingPlan.symbol} ${tradingPlan.side} ${tradingPlan.quantity} (Leverage: ${tradingPlan.leverage}x)`);
+      if(String(tradingPlan.symbol).trim().toUpperCase() == "BTC") {
+        tradingPlan.leverage = 10
+      } else {
+        tradingPlan.leverage = 3
+      }
+      console.log(`🔄 Executing trade: ${tradingPlan.symbol}--------- ${tradingPlan.side} ${tradingPlan.quantity} -------------(Leverage: ${tradingPlan.leverage}x)`);
 
       // 检查API连接
       const isConnected = await this.validateConnection();
@@ -88,6 +93,15 @@ export class TradingExecutor {
         return {
           success: false,
           error: "Failed to connect to Binance API"
+        };
+      }
+
+      // const allowSymbols = process.env.DEFAULT_ALLOW_SYMBOL.split(','); 
+      if (String(tradingPlan.symbol).trim().toUpperCase() != "BTC" && String(tradingPlan.symbol).trim().toUpperCase() != "ETH") {
+        console.log(`Executing trade: ${tradingPlan.symbol} is not allowed`);
+        return {
+          success: false,
+          error: "❌❌❌❌❌Failed Executing trade, this symbol is not allowed"
         };
       }
 
